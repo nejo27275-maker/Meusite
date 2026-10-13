@@ -12,7 +12,7 @@ jobs:
   build:
     name: Build APK and .mcaddon
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -23,8 +23,18 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # The hosted runner already contains Android command-line tools.
+      # Accept licenses non-interactively and install only the SDK components needed
+      # by this project; setup-android@v3 previously stopped at an interactive prompt.
+      - name: Accept Android SDK licenses and install packages
+        shell: bash
+        run: |
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$(command -v sdkmanager)"
+          fi
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -33,6 +43,23 @@ jobs:
 
       - name: Generate block texture
         run: python3 scripts/generate_texture.py
+
+      - name: Validate add-on JSON
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          files = [
+              "addon/behavior_pack/manifest.json",
+              "addon/behavior_pack/blocks/controller.json",
+              "addon/resource_pack/manifest.json",
+              "addon/resource_pack/blocks.json",
+              "addon/resource_pack/textures/terrain_texture.json",
+          ]
+          for item in files:
+              json.loads(Path(item).read_text(encoding="utf-8"))
+              print("JSON OK:", item)
+          PY
 
       - name: Build Android APK
         run: gradle --no-daemon assembleDebug
