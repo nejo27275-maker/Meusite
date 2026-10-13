@@ -1,0 +1,42 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Minecraft LinkBlocks - Behavior",
+    "description": "Regras de botão, temporizador e redstone conectadas à ponte LinkBlocks.",
+    "uuid": "4f590a0d-3c60-4b20-9849-332c52f7f541",
+    "version": [0, 1, 0],
+    "min_engine_version": [1, 26, 60]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "70ec7f9b-46a0-4384-8ea3-9f0400804311",
+      "version": [0, 1, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "f45bb24c-9e8d-4a35-bf55-28f8a8f1e4cd",
+      "version": [0, 1, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "0b4b6cc7-cfc8-4c99-a892-1a0e5f9e7c23",
+      "version": [0, 1, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.4.0"
+    },
+    {
+      "module_name": "@minecraft/server-net",
+      "version": "1.0.0-beta.1.26.60-preview.30"
+    }
+  ],
+  "metadata": {
+    "authors": ["Minecraft LinkBlocks"],
+    "product_type": "addon"
+  }
+}
