@@ -1,0 +1,55 @@
+name: Build Android APK + Bedrock Add-On
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build APK and .mcaddon
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Generate block texture
+        run: python3 scripts/generate_texture.py
+
+      - name: Build Android APK
+        run: gradle --no-daemon assembleDebug
+
+      - name: Package Bedrock Add-On and APK
+        shell: bash
+        run: |
+          mkdir -p dist
+          (cd addon && zip -qr ../dist/minecraft-linkblocks.mcaddon behavior_pack resource_pack)
+          cp app/build/outputs/apk/debug/app-debug.apk dist/Minecraft-LinkBlocks-debug.apk
+          sha256sum dist/* > dist/SHA256SUMS.txt
+          ls -lh dist
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: minecraft-linkblocks-build
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
