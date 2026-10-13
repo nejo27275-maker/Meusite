@@ -117,16 +117,16 @@ class MainActivity : Activity() {
         addText(root, "BLOCO MONITORADO (gatilho de redstone)", 12f, true, 0xFF2363A4.toInt(), dp(20))
         addText(root, "Posição do bloco cuja energia de redstone será observada.", 12f, false, 0xFF43536B.toInt())
         val monitorRow = row(root)
-        monitorX = addField(monitorRow, "X", "0", "0", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED, compact = true)
-        monitorY = addField(monitorRow, "Y", "64", "64", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED, compact = true)
-        monitorZ = addField(monitorRow, "Z", "0", "0", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED, compact = true)
+        monitorX = addCoordinateField(monitorRow, "X", "0")
+        monitorY = addCoordinateField(monitorRow, "Y", "64")
+        monitorZ = addCoordinateField(monitorRow, "Z", "0")
 
         addText(root, "ALVO DA AÇÃO", 12f, true, 0xFF2363A4.toInt(), dp(20))
         addText(root, "Para porta ou lâmpada, informe as coordenadas do bloco a alterar.", 12f, false, 0xFF43536B.toInt())
         val targetRow = row(root)
-        targetX = addField(targetRow, "X", "0", "0", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED, compact = true)
-        targetY = addField(targetRow, "Y", "64", "64", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED, compact = true)
-        targetZ = addField(targetRow, "Z", "1", "1", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED, compact = true)
+        targetX = addCoordinateField(targetRow, "X", "0")
+        targetY = addCoordinateField(targetRow, "Y", "64")
+        targetZ = addCoordinateField(targetRow, "Z", "1")
 
         val saveButton = Button(this).apply {
             text = "Salvar automação"
@@ -397,6 +397,28 @@ class MainActivity : Activity() {
             // Keep coordinate captions above each compact field without changing the field order.
             parent.addView(caption, parent.indexOfChild(input), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         }
+        return input
+    }
+
+    private fun addCoordinateField(parent: LinearLayout, label: String, value: String): EditText {
+        val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        val columnParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+            marginEnd = dp(6)
+        }
+        parent.addView(column, columnParams)
+        addText(column, label, 10f, true, 0xFF43536B.toInt(), 0)
+        val input = EditText(this).apply {
+            setText(value)
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
+            textSize = 14f
+            setSingleLine(true)
+            setPadding(dp(8), dp(6), dp(8), dp(6))
+            contentDescription = label
+        }
+        column.addView(input, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            dp(48)
+        ))
         return input
     }
 
